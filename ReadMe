@@ -1,0 +1,19 @@
+# Read Me
+
+This repository has scripts tha allow for the easy download of different versions of the hashicorp tools in linux.
+
+if the zenity dialog tool is installed, it will pop up a GUI dialog and allow selecting versions of the tools from the dialog.
+
+Example:
+
+```sh
+usage: get-terraform.sh [Options] [VERSION]
+
+   Download and install a version of terraform
+
+   -h          : display this help
+   -l          : list versions
+   -L          : latest version
+   -p          : destination path to install
+
+```
