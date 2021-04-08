@@ -6,6 +6,10 @@ BIN_DIR="$HOME/bin"
 VERSION=
 LIST_ONLY=0
 LATEST=0
+if ! UNZIP=$(which unzip) ; then
+	echo "ERROR: please install unzip"
+	exit 1
+fi
 
 usage()
 {
@@ -67,6 +71,7 @@ if [ $LIST_ONLY -eq 1 ] ; then
 	echo "$VERSIONS"
 	exit
 fi
+
 if [ "$VERSION" != "" ] ; then
 	if ! echo "$VERSIONS" |grep -q "^${VERSION}$"  >/dev/null 2>&1 ; then
 		echo "ERROR: Cannot locate the version: ${VERSION}" >&2
@@ -74,12 +79,41 @@ if [ "$VERSION" != "" ] ; then
 elif [ $LATEST -eq 1 ] ; then
 	VERSION=$(echo "$VERSIONS"|head -1)
 else
-	VERSION=$(zenity --list --title="Select Version" --width=600 --height=400 --column="Version" $VERSIONS)
+	if [ -z $DISPLAY ] ; then
+		# there is no windowing enviroment. display text menu
+		NUM=$( echo "$VERSIONS" | wc -l )
+		declare -a vault_versions
+		while true ; do
+			clear
+			COUNT=0
+			echo "Please select a version:"
+			while read id name ; do
+				COUNT=$(( $COUNT + 1 ))
+				vault_versions[$COUNT]=$id
+				COLOR="\e[$(($COUNT % 2 * 2 * 10 + 7))m"
+				printf "  ${COLOR}%2d  %s\n\e[0m" "$COUNT"  "$id"
+			done < <(echo "${VERSIONS}")
+			read -n 2 -p "Select a version: (1-$COUNT, q=quit)?" answer
+			if [ $answer = "q" ] ; then 
+				echo "User cancelled" >&2
+				exit 1
+			elif [ $answer -ge 1 ] && [ $answer -le $COUNT ] ; then
+				VERSION=${vault_versions[$answer]}
+				echo ""
+				break
+			fi
+		done
+	else
+		VERSION=$(zenity --list --title="Select Version" --width=600 --height=400 --column="Version" $VERSIONS)
+	fi
+
+
 	if [ "$VERSION" = "" ] ; then
 		echo "No version selected" >&2
 		exit 1
 	fi
 fi
+
 
 DOWNLOAD="https://releases.hashicorp.com/packer/${VERSION}/packer_${VERSION}_linux_amd64.zip"
 

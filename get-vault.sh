@@ -6,6 +6,10 @@ BIN_DIR="$HOME/bin"
 VERSION=
 LIST_ONLY=0
 LATEST=0
+if ! UNZIP=$(which unzip) ; then
+	echo "ERROR: please install unzip"
+	exit 1
+fi
 
 usage()
 {
@@ -121,7 +125,7 @@ wget -O "${DEST}" "$DOWNLOAD"
 if [ $? -eq 0 ] ; then
 	ls -l "${DEST}"
 	unzip -d "${tmp_dir}" "${DEST}"
-  if [ -f "${tmp_dir}/vault" ] ; then
+	if [ -f "${tmp_dir}/vault" ] ; then
 		cp "${tmp_dir}/vault" ~/bin
 		echo "Installed version v${VERSION}"
 	else
