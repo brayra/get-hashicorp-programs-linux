@@ -52,7 +52,7 @@ if [ $# -gt 0 ] ; then
 	VERSION="$1"
 fi
 
-VERSIONS=$(wget -O - -q https://releases.hashicorp.com/terraform/|grep 'href="/terraform/'|egrep -v '(rc|oci|alpha|beta)'|sed 's!^.*terraform/\([^/]*\).*$!\1!g')
+VERSIONS=$(wget -O - -q https://releases.hashicorp.com/terraform/|grep 'href="/terraform/'|egrep -v '(rc|oci|alpha|beta)'|sed 's!^.*terraform/\([^/]*\).*$!\1!g'|egrep -v '^0\.[0-9]\.')
 
 if [ $LIST_ONLY -eq 1 ] ; then
 	echo "$VERSIONS"
